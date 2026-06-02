@@ -31,11 +31,11 @@ Matching is the core product logic. Without it users receive nothing.
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 5.1 | Create `app/services/matching.py` | P1 | ⬜ |
-| 5.2 | Filter by `city` — must match user search city | P1 | ⬜ |
-| 5.3 | Filter by `rental_type` — apartment / room / both | P1 | ⬜ |
-| 5.4 | Filter by `price` — must be within user `min_price`–`max_price` | P1 | ⬜ |
-| 5.5 | Filter out listings with `status = removed` | P1 | ⬜ |
+| 5.1 | Create `app/services/matching.py` | P1 | ✅ |
+| 5.2 | Filter by `city` — must match user search city | P1 | ✅ |
+| 5.3 | Filter by `rental_type` — apartment / room / both | P1 | ✅ |
+| 5.4 | Filter by `price` — must be within user `min_price`–`max_price` | P1 | ✅ |
+| 5.5 | Filter out listings with `status = removed` | P1 | ✅ |
 | 5.6 | Filter by `preferred_areas` if set | P2 | ⬜ |
 | 5.7 | Filter out `excluded_areas` if set | P2 | ⬜ |
 | 5.8 | Filter by `must_have` flags (furnished, empadronamiento, pet-friendly, etc.) | P2 | ⬜ |
@@ -46,10 +46,10 @@ Matching is the core product logic. Without it users receive nothing.
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 5.9 | Create `app/services/scoring.py` with deterministic scoring rules | P1 | ⬜ |
-| 5.10 | `+30` price within budget | P1 | ⬜ |
-| 5.11 | `+15` preferred area match | P1 | ⬜ |
-| 5.12 | `+10` furnished (if requested) | P2 | ⬜ |
+| 5.9 | Create `app/services/scoring.py` with deterministic scoring rules | P1 | ✅ |
+| 5.10 | `+30` price within budget | P1 | ✅ |
+| 5.11 | `+15` preferred area match | P1 | ✅ |
+| 5.12 | `+10` furnished (if requested) | P2 | ✅ |
 | 5.13 | `+10` empadronamiento mentioned | P2 | ⬜ |
 | 5.14 | `+10` long-term contract | P2 | ⬜ |
 | 5.15 | `+10` near metro (if requested) | P3 | ⬜ |
@@ -59,7 +59,7 @@ Matching is the core product logic. Without it users receive nothing.
 | 5.19 | `-20` agency fee when user excluded it | P2 | ⬜ |
 | 5.20 | `-30` unclear/missing location | P2 | ⬜ |
 | 5.21 | `-30` missing basic information | P2 | ⬜ |
-| 5.22 | Clamp final score to 0–100 range | P1 | ⬜ |
+| 5.22 | Clamp final score to 0–100 range | P1 | ✅ |
 
 ---
 
@@ -76,9 +76,9 @@ Matching is the core product logic. Without it users receive nothing.
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 5.25 | For each passing listing, create or update row in `matches` table | P1 | ⬜ |
-| 5.26 | Enforce `unique(user_id, listing_id)` constraint — no duplicate matches | P1 | ⬜ |
-| 5.27 | Set `should_notify = True` on new matches above score threshold | P1 | ⬜ |
+| 5.25 | For each passing listing, create or update row in `matches` table | P1 | ✅ |
+| 5.26 | Enforce `unique(user_id, listing_id)` constraint — no duplicate matches | P1 | ✅ |
+| 5.27 | Set `should_notify = True` on new matches above score threshold | P1 | ✅ |
 
 ---
 

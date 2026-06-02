@@ -63,3 +63,7 @@ htmlcov/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Documentation
+*.md
+!README.md

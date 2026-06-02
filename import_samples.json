@@ -1,0 +1,46 @@
+[
+  {
+    "external_id": "bcn_001",
+    "url": "https://example.com/listing/1",
+    "title": "Cozy studio in Gràcia",
+    "description": "Stunning studio in the heart of Gràcia. Furnished, AC, high floor.",
+    "price": 950,
+    "city": "Barcelona",
+    "district": "Gràcia",
+    "neighborhood": "Vila de Gràcia",
+    "rental_type": "apartment",
+    "area_m2": 40,
+    "rooms": 1,
+    "is_furnished": true,
+    "has_elevator": true
+  },
+  {
+    "external_id": "bcn_002",
+    "url": "https://example.com/listing/2",
+    "title": "Modern room near Sagrada Família",
+    "description": "Quiet room in a shared apartment. All bills included. Empadronamiento possible.",
+    "price": 550,
+    "city": "Barcelona",
+    "district": "Eixample",
+    "neighborhood": "Sagrada Família",
+    "rental_type": "room",
+    "area_m2": 12,
+    "is_furnished": true
+  },
+  {
+    "external_id": "bcn_003",
+    "url": "https://example.com/listing/3",
+    "title": "Spacious 3-bed flat in Poblenou",
+    "description": "Large family apartment, 2 mins from the beach. Long term contract only.",
+    "price": 1800,
+    "city": "Barcelona",
+    "district": "Sant Martí",
+    "neighborhood": "El Poblenou",
+    "rental_type": "apartment",
+    "area_m2": 95,
+    "rooms": 3,
+    "bathrooms": 2,
+    "has_elevator": true,
+    "is_furnished": false
+  }
+]

@@ -5,6 +5,22 @@
 
 ---
 
+## 🚦 Project Status
+
+**Current Milestone:** Milestone 2 — Automated Beta (In Progress)
+
+| Module | Status | Description |
+| :--- | :--- | :--- |
+| **Foundation** | ✅ Done | Database, Migrations, Env Config, Logging |
+| **Telegram Bot** | ✅ Done | /start, Onboarding, Search Filters, Feedback |
+| **Data Sources** | 🔄 In Progress | Manual Import (✅), RapidAPI (🔄), User Submission (⬜) |
+| **Matching Engine** | ✅ Done | Hard Filters, Deterministic Scoring, Deduplication |
+| **AI Analysis** | ✅ Done | Ollama Integration, Summary, Red Flag Detection |
+| **Notifications** | ✅ Done | Bilingual Telegram Alerts, Feedback Buttons |
+| **Deployment** | ✅ Done | Docker Compose setup, Main entry point |
+
+---
+
 ## What it does
 
 - Connects to rental listing sources (manual import, user-submitted URLs, and approved APIs)

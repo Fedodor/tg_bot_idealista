@@ -31,13 +31,13 @@ Admin tools allow manual control during beta without a web dashboard.
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 8.1 | Create `app/admin/simple_cli.py` | P2 | ⬜ |
-| 8.2 | CLI command: `import` — load CSV/JSON file of listings | P2 | ⬜ |
+| 8.1 | Create `app/admin/simple_cli.py` | P2 | ✅ |
+| 8.2 | CLI command: `import` — load CSV/JSON file of listings | P2 | ✅ |
 | 8.3 | CLI command: `inspect` — list recent new listings with key fields | P2 | ⬜ |
 | 8.4 | CLI command: `users` — list all active users and their search configs | P2 | ⬜ |
 | 8.5 | CLI command: `matches` — show recent matches per user | P2 | ⬜ |
-| 8.6 | CLI command: `stats` — ingested / matched / notified / failed counts | P2 | ⬜ |
-| 8.7 | Use `typer` or `argparse` for CLI interface | P3 | ⬜ |
+| 8.6 | CLI command: `stats` — ingested / matched / notified / failed counts | P2 | ✅ |
+| 8.7 | Use `typer` or `argparse` for CLI interface | P3 | ✅ |
 
 ---
 

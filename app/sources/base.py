@@ -1,36 +1,28 @@
 """
-Abstract BaseSource interface.
-
-Every source adapter must:
-  - extend BaseSource
-  - implement fetch() returning list[NormalizedListing]
-  - implement health_check() returning bool
-  - handle its own errors internally (log + return empty list on failure)
-  - never leak source-specific logic outside sources/
+Base interface for all rental data sources.
 """
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from typing import Sequence
 
 from app.sources.normalized_listing import NormalizedListing
 
-
 class BaseSource(ABC):
-    """Abstract base class for all listing source adapters."""
-
-    source_name: str = "base"
+    """
+    Abstract base class for source adapters (Idealista, Manual, etc).
+    """
 
     @abstractmethod
-    async def fetch(self) -> list[NormalizedListing]:
+    async def fetch_listings(self, **kwargs) -> Sequence[NormalizedListing]:
         """
-        Fetch new listings from this source.
-
-        Must handle all internal errors and return an empty list on failure.
-        Never raise exceptions to the caller.
+        Fetches and returns a list of standardized listings.
         """
-        raise NotImplementedError
+        pass
 
     @abstractmethod
     async def health_check(self) -> bool:
-        """Return True if the source is reachable and healthy."""
-        raise NotImplementedError
+        """
+        Returns True if the source (API/Scraper) is available.
+        """
+        pass

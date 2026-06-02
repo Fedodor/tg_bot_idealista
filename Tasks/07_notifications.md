@@ -31,13 +31,13 @@ Must work for Milestone 1 (manual import), improves with AI data in Milestone 2.
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 7.1 | Create `app/services/notifications.py` | P1 | ⬜ |
-| 7.2 | Implement `send_listing_alert(user_id, match)` function | P1 | ⬜ |
-| 7.3 | Format alert message per the template in §8.2 of the plan | P1 | ⬜ |
-| 7.4 | Include: price, type, area, match score, risk level, why it matches | P1 | ⬜ |
+| 7.1 | Create `app/services/notifications.py` | P1 | ✅ |
+| 7.2 | Implement `send_listing_alert(user_id, match)` function | P1 | ✅ |
+| 7.3 | Format alert message per the template in §8.2 of the plan | P1 | ✅ |
+| 7.4 | Include: price, type, area, match score, risk level, why it matches | P1 | ✅ |
 | 7.5 | Include AI summary and red flags if `listing_analysis` available | P2 | ⬜ |
 | 7.6 | Include `questions_to_ask` if available from AI | P2 | ⬜ |
-| 7.7 | Include `[Open listing]` link button to original URL | P1 | ⬜ |
+| 7.7 | Include `[Open listing]` link button to original URL | P1 | ✅ |
 
 ---
 
@@ -46,10 +46,10 @@ Must work for Milestone 1 (manual import), improves with AI data in Milestone 2.
 | # | Task | Priority | Status |
 |---|------|----------|--------|
 | 7.8 | Use emoji to improve readability: 🏠 🟢 🔴 ⚠️ | P2 | ⬜ |
-| 7.9 | Show match score as `Match: 86/100` | P1 | ⬜ |
+| 7.9 | Show match score as `Match: 86/100` | P1 | ✅ |
 | 7.10 | Show risk level as `Risk: Low / Medium / High` | P1 | ⬜ |
-| 7.11 | Show "Why it matches" bullet list from `reason_en` / `reason_ru` | P1 | ⬜ |
-| 7.12 | Message respects user's selected language (EN/RU) | P1 | ⬜ |
+| 7.11 | Show "Why it matches" bullet list from `reason_en` / `reason_ru` | P1 | ✅ |
+| 7.12 | Message respects user's selected language (EN/RU) | P1 | ✅ |
 | 7.13 | Message stays within Telegram 4096-char limit — truncate if needed | P2 | ⬜ |
 
 ---
@@ -58,9 +58,9 @@ Must work for Milestone 1 (manual import), improves with AI data in Milestone 2.
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 7.14 | Attach inline keyboard to each alert: `👍 Useful` · `👎 Not relevant` · `🚩 Suspicious` · `📩 Contacted` · `🙈 Hide similar` | P1 | ⬜ |
-| 7.15 | Each button sends callback with `listing_id` and `feedback_type` | P1 | ⬜ |
-| 7.16 | Feedback saved to `feedback` table via `handlers_feedback.py` | P1 | ⬜ |
+| 7.14 | Attach inline keyboard to each alert: `👍 Useful` · `👎 Not relevant` · `🚩 Suspicious` · `📩 Contacted` · `🙈 Hide similar` | P1 | ✅ |
+| 7.15 | Each button sends callback with `listing_id` and `feedback_type` | P1 | ✅ |
+| 7.16 | Feedback saved to `feedback` table via `handlers_feedback.py` | P1 | ✅ |
 | 7.17 | Bot replies with short confirmation on feedback press | P2 | ⬜ |
 
 ---
@@ -69,8 +69,8 @@ Must work for Milestone 1 (manual import), improves with AI data in Milestone 2.
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 7.18 | Check `notifications` table before sending — skip if already sent | P1 | ⬜ |
-| 7.19 | Save Telegram `message_id` and `sent_at` to `notifications` table | P1 | ⬜ |
+| 7.18 | Check `notifications` table before sending — skip if already sent | P1 | ✅ |
+| 7.19 | Save Telegram `message_id` and `sent_at` to `notifications` table | P1 | ✅ |
 | 7.20 | Handle Telegram API errors (rate limits, blocked users) gracefully | P2 | ⬜ |
 | 7.21 | Log failed sends and retry up to N times | P2 | ⬜ |
 
@@ -80,10 +80,10 @@ Must work for Milestone 1 (manual import), improves with AI data in Milestone 2.
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 7.22 | Create `app/workers/notify_worker.py` | P1 | ⬜ |
-| 7.23 | Poll `matches` where `should_notify = True` and no notification sent | P1 | ⬜ |
-| 7.24 | Send alerts and mark notifications as sent | P1 | ⬜ |
-| 7.25 | Run notify worker after analyze worker completes | P1 | ⬜ |
+| 7.22 | Create `app/workers/notify_worker.py` | P1 | ✅ |
+| 7.23 | Poll `matches` where `should_notify = True` and no notification sent | P1 | ✅ |
+| 7.24 | Send alerts and mark notifications as sent | P1 | ✅ |
+| 7.25 | Run notify worker after analyze worker completes | P1 | ✅ |
 
 ---
 

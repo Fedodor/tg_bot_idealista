@@ -40,10 +40,14 @@ class Settings(BaseSettings):
     ollama_base_url: str = Field(
         "http://localhost:11434", description="Ollama server base URL"
     )
-    ollama_model: str = Field("llama3", description="Ollama model name")
+    ollama_model: str = Field("phi3", description="Ollama model name")
 
     # ── Redis ─────────────────────────────────────────────────────────────────
     redis_url: str = Field("redis://localhost:6379/0", description="Redis DSN")
+
+    # ── RapidAPI ──────────────────────────────────────────────────────────────
+    rapidapi_key: str | None = Field(None, alias="RAPID_API", description="API Key for RapidAPI")
+    rapidapi_host: str = Field("idealista-real-estate.p.rapidapi.com", description="RapidAPI service host")
 
 
 # Singleton — import this everywhere instead of re-instantiating

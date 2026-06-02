@@ -44,8 +44,8 @@ Task board following the [MVP Specification](../ai_housing_finder_spain_mvp_plan
 
 | Milestone | Goal | Status |
 |-----------|------|--------|
-| **M1** | Technical Prototype — bot + DB + manual import + basic matching | ⬜ |
-| **M2** | Automated Beta — automated ingestion + AI analysis + alerts | ⬜ |
+| **M1** | Technical Prototype — bot + DB + manual import + basic matching | ✅ |
+| **M2** | Automated Beta — automated ingestion + AI analysis + alerts | 🔄 |
 | **M3** | Paid Validation — 10–20 users + first Hunt Pass payments | ⬜ |
 
 ---

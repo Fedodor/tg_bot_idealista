@@ -15,12 +15,9 @@ async def main() -> None:
     setup_logging(settings.log_level)
 
     # Import here to ensure logging is configured first
-    from app.bot.telegram_app import build_application
+    from app.bot.telegram_app import start_bot
 
-    app = await build_application()
-    await app.start()
-    await app.updater.start_polling()  # type: ignore[union-attr]
-    await asyncio.Event().wait()  # run forever
+    await start_bot()
 
 
 if __name__ == "__main__":

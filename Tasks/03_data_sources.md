@@ -32,10 +32,10 @@ Listing ingestion from allowed sources. Source adapters, legal review, API acces
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 3.1 | Create abstract source interface `app/sources/base.py` | P1 | ⬜ |
-| 3.2 | Define `NormalizedListing` dataclass in `normalized_listing.py` | P1 | ⬜ |
-| 3.3 | All source adapters must return the same `NormalizedListing` format | P1 | ⬜ |
-| 3.4 | Add source health check method to base interface | P2 | ⬜ |
+| 3.1 | Create abstract source interface `app/sources/base.py` | P1 | ✅ |
+| 3.2 | Define `NormalizedListing` dataclass in `normalized_listing.py` | P1 | ✅ |
+| 3.3 | All source adapters must return the same `NormalizedListing` format | P1 | ✅ |
+| 3.4 | Add source health check method to base interface | P2 | ✅ |
 | 3.5 | Add rate limit handling utilities | P2 | ⬜ |
 
 ---
@@ -44,11 +44,11 @@ Listing ingestion from allowed sources. Source adapters, legal review, API acces
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 3.6 | Implement `app/sources/manual_import.py` for CSV/JSON input | P1 | ⬜ |
-| 3.7 | Define expected CSV/JSON schema with all required fields | P1 | ⬜ |
-| 3.8 | Validate and map input to `NormalizedListing` | P1 | ⬜ |
-| 3.9 | Write sample test import file with 5–10 Barcelona listings | P1 | ⬜ |
-| 3.10 | Verify manual import inserts listings into DB correctly | P1 | ⬜ |
+| 3.6 | Implement `app/sources/manual_import.py` for CSV/JSON input | P1 | ✅ |
+| 3.7 | Define expected CSV/JSON schema with all required fields | P1 | ✅ |
+| 3.8 | Validate and map input to `NormalizedListing` | P1 | ✅ |
+| 3.9 | Write sample test import file with 5–10 Barcelona listings | P1 | ✅ |
+| 3.10 | Verify manual import inserts listings into DB correctly | P1 | 🔄 |
 
 ---
 
@@ -103,8 +103,8 @@ Listing ingestion from allowed sources. Source adapters, legal review, API acces
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 3.30 | Implement deduplication by URL / `external_id` / hash in `services/deduplication.py` | P1 | ⬜ |
-| 3.31 | Generate `dedup_hash` from price + city + area + title | P1 | ⬜ |
+| 3.30 | Implement deduplication by URL / `external_id` / hash in `services/deduplication.py` | P1 | ✅ |
+| 3.31 | Generate `dedup_hash` from price + city + area + title | P1 | ✅ |
 | 3.32 | Skip insert if listing with same hash already exists | P1 | ⬜ |
 | 3.33 | Update `last_seen_at` on re-encountered listings | P2 | ⬜ |
 
