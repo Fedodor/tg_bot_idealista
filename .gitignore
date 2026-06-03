@@ -66,4 +66,4 @@ desktop.ini
 
 # Documentation
 *.md
-!README.md
+!/README.md
