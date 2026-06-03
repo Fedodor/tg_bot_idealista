@@ -57,16 +57,19 @@ class UserPlan(str, enum.Enum):
 
 
 class RentalType(str, enum.Enum):
-    APARTMENT = "apartment"
-    ROOM = "room"
-    BOTH = "both"
-    UNKNOWN = "unknown"
+    APARTMENT = "APARTMENT"
+    PENTHOUSE = "PENTHOUSE"
+    HOUSE = "HOUSE"
+    CHALET = "CHALET"
+    ROOM = "ROOM"
+    BOTH = "BOTH"
+    UNKNOWN = "UNKNOWN"
 
 
 class ListingStatus(str, enum.Enum):
-    ACTIVE = "active"
-    REMOVED = "removed"
-    UNKNOWN = "unknown"
+    ACTIVE = "ACTIVE"
+    REMOVED = "REMOVED"
+    UNKNOWN = "UNKNOWN"
 
 
 class RiskLevel(str, enum.Enum):
@@ -158,6 +161,7 @@ class UserSearch(Base):
     must_have: Mapped[Optional[list]] = mapped_column(JSONB, nullable=True)
     nice_to_have: Mapped[Optional[list]] = mapped_column(JSONB, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    last_full_scan_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -175,6 +179,9 @@ class Listing(Base):
     raw_data stores the original source payload.
     """
     __tablename__ = "listings"
+    __table_args__ = (
+        UniqueConstraint("external_id", "source", name="uq_listing_external_source"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     source: Mapped[str] = mapped_column(String(100), nullable=False)          # e.g. "manual_import"
@@ -196,7 +203,9 @@ class Listing(Base):
     bathrooms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     floor: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     has_elevator: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
+    has_lift: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
     is_furnished: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
+    images: Mapped[Optional[list]] = mapped_column(JSONB, nullable=True)
     agency_or_private: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     available_from: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     raw_data: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)

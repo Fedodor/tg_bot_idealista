@@ -16,8 +16,15 @@ async def main() -> None:
 
     # Import here to ensure logging is configured first
     from app.bot.telegram_app import start_bot
+    from app.workers.orchestrator import Orchestrator
 
-    await start_bot()
+    orchestrator = Orchestrator(interval_seconds=settings.refresh_interval_seconds)
+    
+    # Run both the bot and the background work forever
+    await asyncio.gather(
+        start_bot(),
+        orchestrator.start()
+    )
 
 
 if __name__ == "__main__":

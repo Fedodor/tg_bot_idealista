@@ -41,6 +41,14 @@ class Settings(BaseSettings):
         "http://localhost:11434", description="Ollama server base URL"
     )
     ollama_model: str = Field("phi3", description="Ollama model name")
+    # Seconds to wait for a single listing analysis before skipping (0 = no limit)
+    ai_analysis_timeout_seconds: int = Field(
+        90, description="Per-listing AI timeout in seconds. 0 disables timeout."
+    )
+    # GPU layers for Ollama: -1 = auto-detect GPU, 0 = CPU only, N = N layers on GPU
+    ollama_num_gpu: int = Field(
+        -1, description="Ollama num_gpu option. -1=auto-detect, 0=CPU only."
+    )
 
     # ── Redis ─────────────────────────────────────────────────────────────────
     redis_url: str = Field("redis://localhost:6379/0", description="Redis DSN")
@@ -48,6 +56,9 @@ class Settings(BaseSettings):
     # ── RapidAPI ──────────────────────────────────────────────────────────────
     rapidapi_key: str | None = Field(None, alias="RAPID_API", description="API Key for RapidAPI")
     rapidapi_host: str = Field("idealista-real-estate.p.rapidapi.com", description="RapidAPI service host")
+
+    # ── Orchestration ─────────────────────────────────────────────────────────
+    refresh_interval_seconds: int = Field(900, description="Interval between background cycles")
 
 
 # Singleton — import this everywhere instead of re-instantiating

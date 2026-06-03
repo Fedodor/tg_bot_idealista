@@ -8,7 +8,7 @@ from __future__ import annotations
 from sqlalchemy import select, and_
 from sqlalchemy.orm import selectinload
 
-from app.db.models import Listing, UserSearch, Match
+from app.db.models import Listing, UserSearch, Match, ListingStatus
 from app.db.session import AsyncSessionFactory
 from app.services.matching import check_hard_filters
 from app.services.scoring import calculate_score
@@ -33,7 +33,7 @@ class MatchingWorker:
                 return
 
             # 2. Fetch listings
-            listing_stmt = select(Listing).where(Listing.status != "removed")
+            listing_stmt = select(Listing).where(Listing.status != ListingStatus.REMOVED)
             listing_result = await session.execute(listing_stmt)
             listings = listing_result.scalars().all()
             

@@ -10,7 +10,7 @@ from aiogram import Bot
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from app.db.models import Match, Notification, User, Listing
+from app.db.models import Match, Notification, User, Listing, ListingAnalysis
 from app.db.session import AsyncSessionFactory
 from app.services.notifications import send_listing_alert
 from app.config import settings
@@ -26,17 +26,19 @@ class NotifyWorker:
         self.bot = Bot(token=bot_token or settings.telegram_bot_token)
 
     async def run_once(self) -> None:
-        """Fetch unsent matches and deliver them."""
+        """Fetch unsent matches that HAVE AI analysis and deliver them."""
         logger.info("Notify cycle started")
         
         async with AsyncSessionFactory() as session:
-            # Select matches that should be notified but don't have a notification record yet
-            # Task 7.23: Poll matches where should_notify = True and no notification sent
-            subquery = select(Notification.match_id)
+            # Task: Only notify for matches that have already been through AI enrichment
+            # We join with ListingAnalysis to ensure it exists
+            subquery_sent = select(Notification.match_id)
             stmt = (
                 select(Match)
+                .join(Listing, Match.listing_id == Listing.id)
+                .join(ListingAnalysis, Listing.id == ListingAnalysis.listing_id)
                 .where(Match.should_notify == True)
-                .where(~Match.id.in_(subquery))
+                .where(~Match.id.in_(subquery_sent))
                 .options(
                     selectinload(Match.user),
                     selectinload(Match.listing).selectinload(Listing.analysis)

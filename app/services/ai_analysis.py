@@ -35,6 +35,22 @@ class AIAnalysisService:
     def __init__(self, base_url: str | None = None, model: str | None = None) -> None:
         self.base_url = base_url or settings.ollama_base_url
         self.model = model or settings.ollama_model
+        self.num_gpu = self._detect_gpu_setting()
+
+    def _detect_gpu_setting(self) -> int:
+        """Determines num_gpu based on settings and system presence."""
+        if settings.ollama_num_gpu >= 0:
+            return settings.ollama_num_gpu
+        
+        # Auto-detect (-1)
+        import subprocess
+        try:
+            subprocess.run(["nvidia-smi"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            logger.info("NVIDIA GPU detected, using GPU for Ollama")
+            return -1 # -1 means auto in Ollama options
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            logger.info("No NVIDIA GPU found, forcing CPU-only for Ollama")
+            return 0
 
     async def analyze_listing(self, listing_text: str, language: str = "en") -> ListingAnalysisSchema | None:
         """
@@ -47,15 +63,21 @@ class AIAnalysisService:
         prompt = self._build_prompt(safe_text, language)
         
         # 3. Call Ollama (Task 6.6/6.7)
+        # Apply timeout from settings (default 90s)
+        timeout = float(settings.ai_analysis_timeout_seconds) if settings.ai_analysis_timeout_seconds > 0 else 120.0
+        
         try:
-            async with httpx.AsyncClient(timeout=120.0) as client:
+            async with httpx.AsyncClient(timeout=timeout) as client:
                 response = await client.post(
                     f"{self.base_url}/api/generate",
                     json={
                         "model": self.model,
                         "prompt": prompt,
                         "stream": False,
-                        "format": "json"
+                        "format": "json",
+                        "options": {
+                            "num_gpu": self.num_gpu
+                        }
                     }
                 )
                 response.raise_for_status()
