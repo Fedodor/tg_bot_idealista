@@ -1,6 +1,8 @@
 """
 RapidAPI Source Adapter for Idealista.
-Updated for kiwimaker endpoint: https://rapidapi.com/kiwimaker/api/idealista-real-estate
+RE-MAPPED BASED ON BROWSER RESEARCH: 
+Endpoint: /v1/search
+Location Code for Barcelona: [0-EU-ES-08]
 """
 from __future__ import annotations
 
@@ -15,10 +17,15 @@ from app.logging import get_logger
 
 logger = get_logger(__name__)
 
+# Mapping our internal city names to RapidAPI location IDs
+# 0-EU-ES-08 is Barcelona city
+LOCATION_MAPPING = {
+    "barcelona": "0-EU-ES-08"
+}
+
 class RapidAPISource(BaseSource):
     """
-    Implementation of BaseSource using RapidAPI's Idealista Scraper (kiwimaker).
-    Endpoint: /properties/list
+    Implementation of BaseSource using RapidAPI's Idealista Scraper (kiwimaker/v1 style).
     """
 
     def __init__(self, api_key: str | None = None, host: str | None = None) -> None:
@@ -26,42 +33,50 @@ class RapidAPISource(BaseSource):
         self.host = host or settings.rapidapi_host
         self.base_url = f"https://{self.host}"
 
-    async def fetch_listings(self, city: str = "barcelona", rental_type: str = "apartments", **kwargs) -> Sequence[NormalizedListing]:
+    async def fetch_listings(self, city: str = "barcelona", **kwargs) -> Sequence[NormalizedListing]:
         """
-        Calls the RapidAPI endpoint and normalizes the results.
+        Fetches listings from RapidAPI.
+        Supported kwargs:
+        - since: 'W' (week), 'D' (day), 'M' (month)
+        - max_items: int (default 40)
         """
-        if not self.api_key:
-            logger.error("RapidAPI Key missing. Cannot fetch live listings.")
+        if not settings.rapidapi_key:
+            logger.error("RapidAPI key missing")
             return []
 
-        # The kiwimaker API uses /properties/list
-        url = f"{self.base_url}/properties/list"
-        headers = {
-            "X-RapidAPI-Key": self.api_key,
-            "X-RapidAPI-Host": self.host
-        }
+        url = f"https://{settings.rapidapi_host}/v1/search"
         
-        # Payload based on kiwimaker's playground
+        # Mapping our internal city names to RapidAPI location IDs
+        location_id = LOCATION_MAPPING.get(city.lower(), "0-EU-ES-08")
+        
         params = {
-            "locationName": city,
+            "locationIds": f"[{location_id}]",
             "operation": "rent",
-            "propertyType": rental_type,
-            "locale": "en",
+            "propertyType": "homes",
+            "locale": "es",
             "country": "es",
-            "maxItems": "20"
+            "maxItems": str(kwargs.get("max_items", 40)),
+            "numPage": "1"
+        }
+
+        # Handle historical data
+        since = kwargs.get("since")
+        if since:
+            params["minPublicationDate"] = since
+
+        headers = {
+            "x-rapidapi-key": settings.rapidapi_key,
+            "x-rapidapi-host": settings.rapidapi_host
         }
 
         try:
-            async with httpx.AsyncClient(timeout=45.0) as client:
+            async with httpx.AsyncClient(timeout=60.0) as client:
                 response = await client.get(url, headers=headers, params=params)
                 
-                if response.status_code == 404:
-                    # Fallback if endpoint name is slightly different in subscription
-                    logger.warning("Main endpoint failed (404), trying fallback /search")
-                    url = f"{self.base_url}/search"
-                    response = await client.get(url, headers=headers, params=params)
+                if response.status_code != 200:
+                    logger.error("RapidAPI returned error", status=response.status_code, body=response.text)
+                    response.raise_for_status()
 
-                response.raise_for_status()
                 data = response.json()
                 return self._normalize_response(data)
 
@@ -74,22 +89,31 @@ class RapidAPISource(BaseSource):
 
     def _normalize_response(self, data: dict) -> list[NormalizedListing]:
         """
-        Parses complex JSON from RapidAPI into flat NormalizedListing objects.
+        Parses JSON from /v1/search.
+        Expected structure: data['elementList'] or data['data']['elementList']
         """
         normalized = []
-        # kiwimaker structure: elementList
-        items = data.get("elementList") or data.get("data", [])
         
-        # If API returns a message instead of list
-        if isinstance(items, dict):
-            items = items.get("elementList", [])
+        # The /v1 structure usually nests elements in 'data'
+        payload = data.get("data", data)
+        items = payload.get("elementList", [])
 
         for item in items:
             try:
-                # Basic mapping logic (Adjust based on actual API payload)
                 property_id = str(item.get("propertyCode", item.get("id", "")))
                 if not property_id:
                     continue
+
+                # Safe mapping of property type to our enumeration
+                raw_type = item.get("propertyType", "apartment").lower()
+                if "penthouse" in raw_type or "atico" in raw_type:
+                    rental_type = "PENTHOUSE"
+                elif "house" in raw_type or "chalet" in raw_type:
+                    rental_type = "HOUSE"
+                elif "room" in raw_type:
+                    rental_type = "ROOM"
+                else:
+                    rental_type = "APARTMENT"
 
                 nl = NormalizedListing(
                     external_id=property_id,
@@ -98,7 +122,7 @@ class RapidAPISource(BaseSource):
                     title=item.get("suggestedSelfPromotion", item.get("address", "Rental Listing")),
                     description=item.get("description", "No description provided."),
                     price=float(item.get("price", 0)),
-                    rental_type=item.get("propertyType", "apartment"),
+                    rental_type=rental_type,
                     city=item.get("municipality", "Barcelona"),
                     district=item.get("district"),
                     area_m2=float(item.get("size", 0)) if item.get("size") else None,
