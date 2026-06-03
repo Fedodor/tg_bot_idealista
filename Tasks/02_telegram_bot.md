@@ -70,6 +70,7 @@ The bot is the only interface for MVP users. Must be working before beta launch.
 | 2.17 | Implement `/edit_search` — allow updating filters | P2 | ⬜ |
 | 2.18 | Implement `/pause` — deactivate search without deleting | P2 | ⬜ |
 | 2.19 | Implement `/delete_me` — delete all user data (GDPR) | P1 | ✅ |
+| 2.19.1 | Implement `/help` — show help message | P2 | ✅ |
 
 ---
 
@@ -99,8 +100,8 @@ The bot is the only interface for MVP users. Must be working before beta launch.
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| 2.28 | Create simple string translation helper or constants file | P2 | ⬜ |
-| 2.29 | All user-visible strings exist in both EN and RU | P2 | ⬜ |
+| 2.28 | Create simple string translation helper or constants file | P2 | ✅ |
+| 2.29 | All user-visible strings exist in both EN and RU | P2 | ✅ |
 
 ---
 

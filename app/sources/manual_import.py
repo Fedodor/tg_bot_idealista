@@ -26,7 +26,7 @@ class ManualImportSource(BaseSource):
     def __init__(self, file_path: str) -> None:
         self.file_path = file_path
 
-    async def fetch(self) -> list[NormalizedListing]:
+    async def fetch_listings(self, **kwargs) -> list[NormalizedListing]:
         """Reads file and returns a list of NormalizedListings."""
         if not os.path.exists(self.file_path):
             logger.error("Import file not found", path=self.file_path)

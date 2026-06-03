@@ -5,7 +5,7 @@ Registers routers, middlewares, and error handlers.
 """
 from __future__ import annotations
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, types
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -16,6 +16,26 @@ from app.bot.handlers_start import router as start_router
 from app.bot.handlers_feedback import router as feedback_router
 
 logger = get_logger(__name__)
+async def setup_bot_commands(bot: Bot):
+    """Register bot commands in the Telegram menu for different languages."""
+    en_commands = [
+        types.BotCommand(command="start", description="Start or restart onboarding"),
+        types.BotCommand(command="help", description="Show help message"),
+        types.BotCommand(command="my_search", description="View your active search filters"),
+        types.BotCommand(command="delete_me", description="Permanently delete your data"),
+    ]
+    
+    ru_commands = [
+        types.BotCommand(command="start", description="Начать заново"),
+        types.BotCommand(command="help", description="Показать помощь"),
+        types.BotCommand(command="my_search", description="Ваш активный поиск"),
+        types.BotCommand(command="delete_me", description="Удалить все мои данные"),
+    ]
+    
+    await bot.set_my_commands(en_commands)  # Default
+    await bot.set_my_commands(en_commands, language_code="en")
+    await bot.set_my_commands(ru_commands, language_code="ru")
+    logger.info("Bot commands registered in Telegram menu (EN/RU)")
 
 
 async def build_application() -> Dispatcher:
@@ -36,7 +56,7 @@ async def build_application() -> Dispatcher:
     @dp.startup()
     async def on_startup():
         logger.info("Bot is starting up...")
-        # setup_db_checks() or similar could go here
+        await setup_bot_commands(bot)
     
     @dp.shutdown()
     async def on_shutdown():
@@ -49,10 +69,16 @@ async def build_application() -> Dispatcher:
 
 async def start_bot():
     """Entry point for the bot runner."""
-    dp = await build_application()
-    bot = Bot(token=settings.telegram_bot_token)
-    
     try:
+        dp = await build_application()
+        bot = Bot(
+            token=settings.telegram_bot_token,
+            default=DefaultBotProperties(parse_mode=ParseMode.HTML),
+        )
+        
+        logger.info("Starting polling...")
         await dp.start_polling(bot)
+    except Exception as e:
+        logger.error("Bot crashed during startup/polling", error=str(e), exc_info=True)
     finally:
-        await bot.session.close()
+        logger.info("Bot execution finished.")

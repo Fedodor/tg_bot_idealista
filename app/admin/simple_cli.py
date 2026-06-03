@@ -25,7 +25,7 @@ logger = get_logger(__name__)
 async def cmd_import(file_path: str):
     """Manually triggers ingestion from a file."""
     source = ManualImportSource(file_path)
-    worker = IngestWorker(sources=[source])
+    worker = IngestWorker(source=source)
     await worker.run_once()
 
 

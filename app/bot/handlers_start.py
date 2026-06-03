@@ -53,14 +53,23 @@ async def cmd_start(message: types.Message, state: FSMContext):
         
         await session.commit()
         
-        welcome_text = (
-            "🇬🇧 Welcome! I help people relocating to Spain find apartments and rooms faster.\n\n"
-            "🇷🇺 Добро пожаловать! Я помогаю людям, переезжающим в Испанию, быстрее находить квартиры и комнаты.\n\n"
-            "Please choose your language / Пожалуйста, выберите язык:"
-        )
+        welcome_text = t("welcome_start", user.language)
         
         await state.set_state(SearchCreation.choosing_language)
-        await message.answer(welcome_text, reply_markup=get_language_keyboard())
+        await message.answer(welcome_text, reply_markup=get_language_keyboard(), parse_mode="Markdown")
+
+
+@router.message(Command("help"))
+async def cmd_help(message: types.Message):
+    """Shows help message."""
+    user_id = message.from_user.id
+    async with AsyncSessionFactory() as session:
+        stmt = select(User).where(User.telegram_id == user_id)
+        result = await session.execute(stmt)
+        user = result.scalar_one_or_none()
+        lang = user.language if user else Language.EN
+        
+    await message.answer(t("help_text", lang), parse_mode="Markdown")
 
 
 @router.callback_query(F.data.startswith("set_lang_"), SearchCreation.choosing_language)
@@ -78,14 +87,11 @@ async def process_language_selection(callback: types.CallbackQuery, state: FSMCo
             user.language = Language.RU if lang_code == "ru" else Language.EN
             await session.commit()
             
-    lang_name = "Русский" if lang_code == "ru" else "English"
+    lang_name = "Русский 🇷🇺" if lang_code == "ru" else "English 🇬🇧"
     
-    # Text for the next step
-    question = "What are you looking for? / Что вы ищете?"
-    
-    await callback.answer(f"Language set to {lang_name}")
+    await callback.answer(t("language_set", lang_code))
     await callback.message.edit_text(
-        f"Language: {lang_name}\n\n{question}",
+        f"✅ {lang_name}\n\n" + t("what_looking_for", lang_code),
         reply_markup=get_rental_type_keyboard()
     )
     await state.set_state(SearchCreation.choosing_rental_type)
@@ -97,39 +103,51 @@ async def process_rental_type(callback: types.CallbackQuery, state: FSMContext):
     rtype_str = callback.data.replace("type_", "").upper()
     await state.update_data(rental_type=rtype_str)
     
-    prompt = "What is your MINIMUM monthly budget in EUR? (e.g. 500)"
-    if rtype_str == "ROOM":
-         prompt = "What is your MINIMUM monthly budget for a ROOM in EUR?"
+    user_id = callback.from_user.id
+    async with AsyncSessionFactory() as session:
+        result = await session.execute(select(User).where(User.telegram_id == user_id))
+        user = result.scalar_one()
+        lang = user.language
 
-    await callback.message.edit_text(f"Type: {rtype_str}\n\n{prompt}")
+    prompt = t("budget_min_room" if rtype_str == "ROOM" else "budget_min", lang)
+
+    await callback.message.edit_text(f"🏠 {rtype_str.title()}\n\n{prompt}", parse_mode="Markdown")
     await state.set_state(SearchCreation.entering_budget_min)
 
 
 @router.message(SearchCreation.entering_budget_min)
 async def process_budget_min(message: types.Message, state: FSMContext):
     """Handles minimum budget input."""
+    user_id = message.from_user.id
+    async with AsyncSessionFactory() as session:
+        result = await session.execute(select(User).where(User.telegram_id == user_id))
+        user = result.scalar_one()
+        lang = user.language
+
     if not message.text or not message.text.isdigit():
-        await message.answer("Please enter a number (e.g. 600):")
+        await message.answer(t("enter_number", lang))
         return
     
     await state.update_data(min_price=float(message.text))
-    await message.answer("And your MAXIMUM monthly budget? (e.g. 1500)")
+    await message.answer(t("budget_max", lang), parse_mode="Markdown")
     await state.set_state(SearchCreation.entering_budget_max)
 
 
 @router.message(SearchCreation.entering_budget_max)
 async def process_budget_max(message: types.Message, state: FSMContext):
     """Handles maximum budget input."""
+    user_id = message.from_user.id
+    async with AsyncSessionFactory() as session:
+        result = await session.execute(select(User).where(User.telegram_id == user_id))
+        user = result.scalar_one()
+        lang = user.language
+
     if not message.text or not message.text.isdigit():
-        await message.answer("Please enter a number (e.g. 1500):")
+        await message.answer(t("enter_number", lang))
         return
     
     await state.update_data(max_price=float(message.text))
-    await message.answer(
-        "Which areas in Barcelona do you prefer?\n"
-        "Enter area names or zip codes (e.g. Eixample, Gràcia, 08005).\n"
-        "Separate with commas."
-    )
+    await message.answer(t("areas_prompt", lang))
     await state.set_state(SearchCreation.entering_areas)
 
 
@@ -147,7 +165,7 @@ async def process_areas(message: types.Message, state: FSMContext):
         user = result.scalar_one_or_none()
         
         if not user:
-             await message.answer("Error: User session lost. Please run /start again.")
+             await message.answer(t("session_lost", Language.EN))
              await state.clear()
              return
 
@@ -163,16 +181,17 @@ async def process_areas(message: types.Message, state: FSMContext):
         )
         session.add(new_search)
         await session.commit()
+        lang = user.language
     
-    summary = (
-        "**Search created!**\n\n"
-        f"City: Barcelona\n"
-        f"Type: {user_data['rental_type']}\n"
-        f"Budget: {user_data['min_price']} - {user_data['max_price']} EUR\n"
-        f"Areas: {', '.join(areas)}\n\n"
-        "I will now start monitoring listings for you. You will receive alerts here."
+    summary = t("search_summary", lang).format(
+        city="Barcelona",
+        type=user_data['rental_type'].title(),
+        min=user_data['min_price'],
+        max=user_data['max_price'],
+        areas=", ".join(areas)
     )
     
+    await message.answer(t("search_created", lang), parse_mode="Markdown")
     await message.answer(summary, parse_mode="Markdown")
     await state.clear()
 
@@ -182,20 +201,30 @@ async def cmd_my_search(message: types.Message):
     """Shows the user's active search."""
     user_id = message.from_user.id
     async with AsyncSessionFactory() as session:
-        stmt = select(UserSearch).join(User).where(User.telegram_id == user_id, UserSearch.is_active == True)
+        # Join user to get language and to filter by telegram_id
+        stmt = (
+            select(UserSearch, User.language)
+            .join(User)
+            .where(User.telegram_id == user_id, UserSearch.is_active == True)
+        )
         result = await session.execute(stmt)
-        search = result.scalar_one_or_none()
+        row = result.first()
         
-        if not search:
-            await message.answer("You don't have an active search yet. Run /start to create one.")
+        if not row:
+            # Need to get user language separately if no search found
+            user_result = await session.execute(select(User).where(User.telegram_id == user_id))
+            user = user_result.scalar_one_or_none()
+            lang = user.language if user else Language.EN
+            await message.answer(t("no_active_search", lang))
             return
             
-        summary = (
-            "**Your Active Search**\n\n"
-            f"City: {search.city.title()}\n"
-            f"Type: {search.rental_type.value}\n"
-            f"Budget: {search.min_price} - {search.max_price} EUR\n"
-            f"Areas: {', '.join(search.preferred_areas or [])}\n"
+        search, lang = row
+        summary = t("search_summary", lang).format(
+            city=search.city.title(),
+            type=search.rental_type.value.title(),
+            min=search.min_price,
+            max=search.max_price,
+            areas=", ".join(search.preferred_areas or [])
         )
         await message.answer(summary, parse_mode="Markdown")
 
@@ -210,8 +239,9 @@ async def cmd_delete_me(message: types.Message):
         user = result.scalar_one_or_none()
         
         if user:
+            lang = user.language
             await session.delete(user)
             await session.commit()
-            await message.answer("Your account and all searches have been deleted. Goodbye!")
+            await message.answer(t("delete_confirm", lang))
         else:
-            await message.answer("You are not registered in our system.")
+            await message.answer(t("not_registered", Language.EN))
