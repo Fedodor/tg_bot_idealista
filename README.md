@@ -165,9 +165,3 @@ English and Russian.
 - No logging of user message content
 - AI analysis is informational only, not legal advice
 - Contact data stripped before sending to LLM
-
----
-
-## License
-
-Private / proprietary — not open source.
